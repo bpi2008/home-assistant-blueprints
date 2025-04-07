@@ -1,26 +1,13 @@
 blueprint:
-  name: Notifications SMS - Rallumage après délai
-  description: Rallume un input_boolean après un délai basé sur deux input_number.
+  name: Test Notifications SMS - Blueprint basique
+  description: Teste la réactivation d’un boolean après 1 minute
   domain: automation
   input:
     cible_boolean:
-      name: Entité boolean
-      description: Le boolean à rallumer
+      name: Boolean à tester
       selector:
         entity:
           domain: input_boolean
-    heures:
-      name: Input number heures
-      description: Entité input_number pour les heures
-      selector:
-        entity:
-          domain: input_number
-    minutes:
-      name: Input number minutes
-      description: Entité input_number pour les minutes
-      selector:
-        entity:
-          domain: input_number
 
 trigger:
   - platform: state
@@ -29,11 +16,9 @@ trigger:
 
 action:
   - delay:
-      hours: "{{ states[inputs.heures] | float(0) | int }}"
-      minutes: "{{ states[inputs.minutes] | float(0) | int }}"
+      minutes: 1
   - service: input_boolean.turn_on
     target:
       entity_id: !input cible_boolean
 
 mode: single
-
