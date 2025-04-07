@@ -1,0 +1,44 @@
+blueprint:
+  name: Notifications SMS - Rallumage après délai configurable
+  description: >
+    Rallume automatiquement le boolean `notifications_sms` après un temps défini en heures et minutes, via deux input_number.
+  domain: automation
+  input:
+    boolean_cible:
+      name: Boolean à surveiller
+      selector:
+        entity:
+          domain: input_boolean
+    delai_heures:
+      name: Heures d'attente
+      selector:
+        entity:
+          domain: input_number
+    delai_minutes:
+      name: Minutes d'attente
+      selector:
+        entity:
+          domain: input_number
+
+trigger:
+  - platform: state
+    entity_id: !input boolean_cible
+    to: 'off'
+
+mode: single
+
+action:
+  - wait_for_trigger:
+      - platform: state
+        entity_id: !input boolean_cible
+        to: 'off'
+        for:
+          hours: "{{ states(!input delai_heures) | int }}"
+          minutes: "{{ states(!input delai_minutes) | int }}"
+    timeout:
+      hours: 24
+    continue_on_timeout: false
+
+  - service: input_boolean.turn_on
+    target:
+      entity_id: !input boolean_cible
