@@ -36,3 +36,4 @@ action:
       entity_id: !input cible_boolean
 
 mode: single
+
