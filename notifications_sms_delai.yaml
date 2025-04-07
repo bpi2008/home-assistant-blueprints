@@ -1,6 +1,6 @@
 blueprint:
   name: Notifications SMS - Rallumage après délai
-  description: Rallume un boolean après un délai défini via deux input_number.
+  description: Rallume un input_boolean après un délai basé sur deux input_number.
   domain: automation
   input:
     cible_boolean:
@@ -28,12 +28,9 @@ trigger:
     to: "off"
 
 action:
-  - variables:
-      delay_hours: "{{ states[ this.attributes.heures ] | float(0) }}"
-      delay_minutes: "{{ states[ this.attributes.minutes ] | float(0) }}"
   - delay:
-      hours: "{{ delay_hours | int }}"
-      minutes: "{{ delay_minutes | int }}"
+      hours: "{{ states[inputs.heures] | float(0) | int }}"
+      minutes: "{{ states[inputs.minutes] | float(0) | int }}"
   - service: input_boolean.turn_on
     target:
       entity_id: !input cible_boolean
