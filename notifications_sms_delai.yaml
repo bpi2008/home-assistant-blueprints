@@ -1,44 +1,44 @@
 blueprint:
   name: Notifications SMS - Rallumage après délai configurable
-  description: >
-    Rallume automatiquement le boolean `notifications_sms` après un temps défini en heures et minutes, via deux input_number.
+  description: Désactive le boolean et le rallume après un délai personnalisé.
   domain: automation
   input:
-    boolean_cible:
-      name: Boolean à surveiller
+    cible_boolean:
+      name: Boolean de notification
+      description: Le boolean à réactiver
       selector:
         entity:
           domain: input_boolean
-    delai_heures:
-      name: Heures d'attente
+    heures:
+      name: Heures de délai
+      description: Entité `input_number` pour le nombre d'heures à attendre
       selector:
         entity:
           domain: input_number
-    delai_minutes:
-      name: Minutes d'attente
+    minutes:
+      name: Minutes de délai
+      description: Entité `input_number` pour le nombre de minutes à attendre
       selector:
         entity:
           domain: input_number
 
 trigger:
   - platform: state
-    entity_id: !input boolean_cible
-    to: 'off'
+    entity_id: !input cible_boolean
+    to: "off"
 
-mode: single
+variables:
+  heures: "{{ states(!input 'heures') | float(0) }}"
+  minutes: "{{ states(!input 'minutes') | float(0) }}"
+
+condition: []
 
 action:
-  - wait_for_trigger:
-      - platform: state
-        entity_id: !input boolean_cible
-        to: 'off'
-        for:
-          hours: "{{ states(!input delai_heures) | int }}"
-          minutes: "{{ states(!input delai_minutes) | int }}"
-    timeout:
-      hours: 24
-    continue_on_timeout: false
-
+  - delay:
+      hours: "{{ heures | int }}"
+      minutes: "{{ minutes | int }}"
   - service: input_boolean.turn_on
     target:
-      entity_id: !input boolean_cible
+      entity_id: !input cible_boolean
+
+mode: single
